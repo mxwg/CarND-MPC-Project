@@ -7,8 +7,9 @@
 using namespace std;
 
 class MPC {
+    std::vector<double> factors;
 public:
-    MPC();
+    MPC(std::vector<double> factors);
 
     virtual ~MPC();
 
