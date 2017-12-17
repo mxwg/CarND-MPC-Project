@@ -104,7 +104,7 @@ int main(int argc, char *argv[]) {
                 // "42" at the start of the message means there's a websocket message event.
                 // The 4 signifies a websocket message
                 // The 2 signifies a websocket event
-                if (steps > 3500) {  // exit early
+                if (steps > 500) {  // exit early
                     exit(0);
                 }
                 steps++;

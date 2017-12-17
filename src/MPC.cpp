@@ -10,7 +10,7 @@ size_t N = 10;
 double dt = 0.1;
 
 // reference velocity
-double ref_v = 70;
+double ref_v = 80;
 
 // offsets for DD vector
 size_t x_s = 0;
