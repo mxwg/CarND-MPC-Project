@@ -10,7 +10,7 @@ size_t N = 10;
 double dt = 0.1;
 
 // reference velocity
-double ref_v = 50;
+double ref_v = 70;
 
 // offsets for DD vector
 size_t x_s = 0;
@@ -60,6 +60,7 @@ public:
         double sequentialSteerFactor = factors[4];
         double sequentialAccFactor = factors[5];
 
+        std::cout << "steerFactor: " << steerFactor << std::endl;
         // initialize cost
         fg[0] = 0;
 
@@ -233,6 +234,11 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
     // Check some of the solution values
     ok &= solution.status == CppAD::ipopt::solve_result<Dvector>::success;
 
+    if (!ok)
+    {
+        std::cout << "WARNING: could not optimize values!" << std::endl;
+    }
+
     // Cost
     auto cost = solution.obj_value;
     std::cout << "Cost " << cost << std::endl;
@@ -254,8 +260,9 @@ vector<double> MPC::Solve(Eigen::VectorXd state, Eigen::VectorXd coeffs) {
 
     std::vector<double> result =
             {
-                    solution.x[1 + delta_s],
-                    solution.x[1 + a_s]
+                    solution.x[delta_s],
+                    solution.x[a_s],
+                    cost
             };
 
     // predicted values

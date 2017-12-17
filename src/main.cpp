@@ -103,7 +103,7 @@ int main(int argc, char *argv[]) {
                 // "42" at the start of the message means there's a websocket message event.
                 // The 4 signifies a websocket message
                 // The 2 signifies a websocket event
-                if (steps > 100) {  // exit early
+                if (steps > 3500) {  // exit early
                     exit(0);
                 }
                 steps++;
@@ -141,7 +141,7 @@ int main(int argc, char *argv[]) {
 
                             // fit coefficients
                             auto coeffs = polyfit(carX, carY, 3);
-                            std::cout << coeffs << std::endl;
+//                            std::cout << coeffs << std::endl;
 
                             // calculate errors
                             double cte = polyeval(coeffs, 0);
@@ -158,8 +158,9 @@ int main(int argc, char *argv[]) {
 
                             steer_value = solution[0] * steeringFactor / deg2rad(25);
                             throttle_value = solution[1];
+                            double cost = solution[2] / 1000;
 
-                            std::cout << "steer: " << rad2deg(steer_value) << ", throttle: " << throttle_value
+                            std::cout << "steer: " << steer_value << ", throttle: " << throttle_value
                                       << std::endl;
 
                             json msgJson;
@@ -169,14 +170,14 @@ int main(int argc, char *argv[]) {
                             msgJson["throttle"] = throttle_value;
 
                             // write values to log file
-                            log << cte << " " << epsi << " " << steer_value << " " << throttle_value << std::endl;
+                            log << cte << " " << epsi << " " << steer_value << " " << throttle_value << " " << cost << std::endl;
 
 
                             //Display the MPC predicted trajectory
                             vector<double> mpc_x_vals;
                             vector<double> mpc_y_vals;
-                            for (size_t i = 2; i < solution.size(); ++i) {
-                                if (i % 2 == 0) {
+                            for (size_t i = 3; i < solution.size(); ++i) {
+                                if (i % 2 != 0) {
                                     mpc_x_vals.push_back(solution[i]);
                                 } else {
                                     mpc_y_vals.push_back(solution[i]);
@@ -185,6 +186,12 @@ int main(int argc, char *argv[]) {
 
                             //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
                             // the points in the simulator are connected by a Green line
+
+//                            std::cout << "mpc  vals" << std::endl;
+//                            for(size_t i = 0; i < mpc_x_vals.size(); ++i)
+//                            {
+//                                std::cout << mpc_x_vals[i] << " " << mpc_y_vals[i] << std::endl;
+//                            }
 
                             msgJson["mpc_x"] = mpc_x_vals;
                             msgJson["mpc_y"] = mpc_y_vals;
@@ -206,7 +213,7 @@ int main(int argc, char *argv[]) {
 
 
                             auto msg = "42[\"steer\"," + msgJson.dump() + "]";
-                            std::cout << msg << std::endl;
+//                            std::cout << msg << std::endl;
                             // Latency
                             // The purpose is to mimic real driving conditions where
                             // the car does actuate the commands instantly.

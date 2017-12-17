@@ -1,0 +1,13 @@
+#!/bin/bash
+
+# cteFactor = factors[0];
+# epsiFactor = factors[1];
+# steerFactor = factors[2];
+# accFactor = factors[3];
+# sequentialSteerFactor = factors[4];
+# sequentialAccFactor = factors[5];
+make && ./mpc 20 20 0.1 0.1 0.1 0.1 
+gnuplot error_plot.gpt
+#NAME="p_$1_d_$2_i_$3.png"
+#mv plot.png $NAME && eog $NAME
+
