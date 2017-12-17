@@ -95,10 +95,11 @@ int main(int argc, char *argv[]) {
     // MPC is initialized here!
     MPC mpc(factors);
 
+    double prevX, prevY;
     size_t steps = 0;
 
     h.onMessage(
-            [&steps, &log, &mpc](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+            [&steps,&prevX, &prevY, &log, &mpc](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                                  uWS::OpCode opCode) {
                 // "42" at the start of the message means there's a websocket message event.
                 // The 4 signifies a websocket message
@@ -124,6 +125,22 @@ int main(int argc, char *argv[]) {
                             double py = j[1]["y"];
                             double psi = j[1]["psi"];
                             double v = j[1]["speed"];
+                            
+                            // predict car position with latency
+                            int latency_ms = 100;
+                            double delta = j[1]["steering_angle"];
+                            delta *= steeringFactor;
+                            double a = j[1]["throttle"];
+                            a *= deg2rad(25);
+                            double dt = latency_ms / 1000.0 / 2;
+                            double Lf = 2.67;
+                            px = (px + v * cos(psi) * dt);
+                            py = (py + v * sin(psi) * dt);
+                            psi = (psi + v * delta / Lf * dt);
+                            v = (v + a * dt);
+                            std::cout << j[1]["x"] << "->" << px << " (x)\n";
+                            std::cout << j[1]["y"] << "->" << py << " (y)\n";
+                            std::cout << j[1]["speed"] << "->" << v << " (v)\n";
 
                             // transform points to car coordinates
                             Eigen::VectorXd carX(6), carY(6);
@@ -138,6 +155,8 @@ int main(int argc, char *argv[]) {
                                 ptsCarX.push_back(carX[i]);
                                 ptsCarY.push_back(carY[i]);
                             }
+                            prevX = px;
+                            prevY = py;
 
                             // fit coefficients
                             auto coeffs = polyfit(carX, carY, 3);
@@ -223,7 +242,7 @@ int main(int argc, char *argv[]) {
                             //
                             // NOTE: REMEMBER TO SET THIS TO 100 MILLISECONDS BEFORE
                             // SUBMITTING.
-//                            this_thread::sleep_for(chrono::milliseconds(100));
+                            this_thread::sleep_for(chrono::milliseconds(latency_ms));
                             ws.send(msg.data(), msg.length(), uWS::OpCode::TEXT);
                         }
                     } else {
