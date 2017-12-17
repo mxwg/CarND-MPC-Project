@@ -110,7 +110,7 @@ int main(int argc, char *argv[]) {
                 steps++;
 
                 string sdata = string(data).substr(0, length);
-                cout << sdata << endl;
+//                cout << sdata << endl;
                 if (sdata.size() > 2 && sdata[0] == '4' && sdata[1] == '2') {
                     string s = hasData(sdata);
                     if (s != "") {
@@ -138,9 +138,6 @@ int main(int argc, char *argv[]) {
                             py = (py + v * sin(psi) * dt);
                             psi = (psi + v * delta / Lf * dt);
                             v = (v + a * dt);
-                            std::cout << j[1]["x"] << "->" << px << " (x)\n";
-                            std::cout << j[1]["y"] << "->" << py << " (y)\n";
-                            std::cout << j[1]["speed"] << "->" << v << " (v)\n";
 
                             // transform points to car coordinates
                             Eigen::VectorXd carX(6), carY(6);
@@ -160,7 +157,6 @@ int main(int argc, char *argv[]) {
 
                             // fit coefficients
                             auto coeffs = polyfit(carX, carY, 3);
-//                            std::cout << coeffs << std::endl;
 
                             // calculate errors
                             double cte = polyeval(coeffs, 0);
@@ -205,12 +201,7 @@ int main(int argc, char *argv[]) {
 
                             //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
                             // the points in the simulator are connected by a Green line
-
-//                            std::cout << "mpc  vals" << std::endl;
-//                            for(size_t i = 0; i < mpc_x_vals.size(); ++i)
-//                            {
-//                                std::cout << mpc_x_vals[i] << " " << mpc_y_vals[i] << std::endl;
-//                            }
+                            
 
                             msgJson["mpc_x"] = mpc_x_vals;
                             msgJson["mpc_y"] = mpc_y_vals;
