@@ -76,18 +76,25 @@ double norm(double angle) {
 int main(int argc, char *argv[]) {
     uWS::Hub h;
 
+    std::vector<double> factors;
     // get error factors from command line
     if (argc < 1 + 5) {
         std::cout << "Not all factors were supplied!" << std::endl;
-        exit(1);
-    }
-    std::vector<double> factors;
-    factors.push_back(atof(argv[1]));
-    factors.push_back(atof(argv[2]));
-    factors.push_back(atof(argv[3]));
-    factors.push_back(atof(argv[4]));
-    factors.push_back(atof(argv[5]));
+        std::cout << "Using default values..." << std::endl;
 
+        factors.push_back(20); // cte
+        factors.push_back(20); // epsi
+        factors.push_back(0.1); // steer
+        factors.push_back(0.1); // acceleration
+        factors.push_back(0.1); // sequential steer
+        factors.push_back(0.1); // sequential acceleration
+    } else {
+        factors.push_back(atof(argv[1]));
+        factors.push_back(atof(argv[2]));
+        factors.push_back(atof(argv[3]));
+        factors.push_back(atof(argv[4]));
+        factors.push_back(atof(argv[5]));
+    }
     std::ofstream log;
     log.open("error.csv");
     log << "# cte epsi steer_value throttle_value" << std::endl;
@@ -131,6 +138,8 @@ int main(int argc, char *argv[]) {
                             delta *= steeringFactor;
                             double a = j[1]["throttle"];
                             a *= deg2rad(25);
+                            // don't predict for the whole latency so as to
+                            // smooth out the results a little
                             double dt = latency_ms / 1000.0 / 2;
                             double Lf = 2.67;
                             px = (px + v * cos(psi) * dt);
