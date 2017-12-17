@@ -95,11 +95,10 @@ int main(int argc, char *argv[]) {
     // MPC is initialized here!
     MPC mpc(factors);
 
-    double prevX, prevY;
     size_t steps = 0;
 
     h.onMessage(
-            [&steps,&prevX, &prevY, &log, &mpc](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
+            [&steps, &log, &mpc](uWS::WebSocket<uWS::SERVER> ws, char *data, size_t length,
                                  uWS::OpCode opCode) {
                 // "42" at the start of the message means there's a websocket message event.
                 // The 4 signifies a websocket message
@@ -125,7 +124,7 @@ int main(int argc, char *argv[]) {
                             double py = j[1]["y"];
                             double psi = j[1]["psi"];
                             double v = j[1]["speed"];
-                            
+
                             // predict car position with latency
                             int latency_ms = 100;
                             double delta = j[1]["steering_angle"];
@@ -152,8 +151,6 @@ int main(int argc, char *argv[]) {
                                 ptsCarX.push_back(carX[i]);
                                 ptsCarY.push_back(carY[i]);
                             }
-                            prevX = px;
-                            prevY = py;
 
                             // fit coefficients
                             auto coeffs = polyfit(carX, carY, 3);
@@ -185,7 +182,8 @@ int main(int argc, char *argv[]) {
                             msgJson["throttle"] = throttle_value;
 
                             // write values to log file
-                            log << cte << " " << epsi << " " << steer_value << " " << throttle_value << " " << cost << std::endl;
+                            log << cte << " " << epsi << " " << steer_value << " " << throttle_value << " " << cost
+                                << std::endl;
 
 
                             //Display the MPC predicted trajectory
@@ -201,7 +199,7 @@ int main(int argc, char *argv[]) {
 
                             //.. add (x,y) points to list here, points are in reference to the vehicle's coordinate system
                             // the points in the simulator are connected by a Green line
-                            
+
 
                             msgJson["mpc_x"] = mpc_x_vals;
                             msgJson["mpc_y"] = mpc_y_vals;
